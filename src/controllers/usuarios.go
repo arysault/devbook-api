@@ -5,6 +5,7 @@ import (
 	"devbook-api/src/models"
 	"devbook-api/src/repositories"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -28,7 +29,13 @@ func CriarUsuarios(w http.ResponseWriter, r *http.Request) {
 	}
 
 	repositories := repositories.NovoRepositorioDeUsuarios(db)
-	repositories.Criar(usuario)
+	usuarioId, erro := repositories.Criar(usuario)
+	if erro != nil {
+		log.Fatal(erro)
+	}
+
+	w.Write([]byte(fmt.Sprintf("Id inserido %d", usuarioId)))
+
 }
 
 // BuscarUsuarios busca uma lista de usuarios no banco de dados
