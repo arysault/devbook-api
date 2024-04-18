@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 // CriarUsiarios cria insere usuaios no Banco
@@ -20,6 +21,11 @@ func CriarUsuarios(w http.ResponseWriter, r *http.Request) {
 
 	var usuario models.Usuario
 	if erro = json.Unmarshal(corpoRequest, &usuario); erro != nil {
+		responses.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	if erro = usuario.Preparar(); erro != nil {
 		responses.Erro(w, http.StatusBadRequest, erro)
 		return
 	}
@@ -45,7 +51,22 @@ func CriarUsuarios(w http.ResponseWriter, r *http.Request) {
 
 // BuscarUsuarios busca uma lista de usuarios no banco de dados
 func BuscarUsuarios(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Buscando usuários"))
+	nomeOrNick := strings.ToLower(r.URL.Query().Get("usuario"))
+	db, erro := banco.Conectar()
+	if erro != nil {
+		responses.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+
+	defer db.Close()
+
+	repositories := repositories.NovoRepositorioDeUsuarios(db)
+	usuarios, erro := repositories.Buscar(nomeOrNick)
+	if erro != nil {
+		responses.Erro(w, http.StatusInternalServerError, erro)
+		return
+	}
+	responses.JSON(w, http.StatusOK, usuarios)
 }
 
 // BuscarUsuario busca um usuário por ID no banco
