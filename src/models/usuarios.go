@@ -49,6 +49,6 @@ func (usuario *Usuario) validar() error {
 
 func (usuario *Usuario) formatar() {
 	usuario.Nome = strings.TrimSpace(usuario.Nome)
-	usuario.Nick = strings.TrimSpace(usuario.Nome)
-	usuario.Email = strings.TrimSpace(usuario.Nome)
+	usuario.Nick = strings.TrimSpace(usuario.Nick)
+	usuario.Email = strings.TrimSpace(usuario.Email)
 }

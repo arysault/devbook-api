@@ -73,3 +73,30 @@ func (u usuarios) Buscar(nomeOrNick string) ([]models.Usuario, error) {
 
 	return usuarios, nil
 }
+
+// FindByID traz um unico usuario pesquisado no banco de dados
+func (u usuarios) FindByID(ID uint64) (models.Usuario, error) {
+	rows, erro := u.db.Query(
+		"select id, nome, nick, email, criadoEm from usuarios where id = ?",
+		ID,
+	)
+	if erro != nil {
+		return models.Usuario{}, erro
+	}
+	defer rows.Close()
+
+	var user models.Usuario
+	if rows.Next() {
+		if erro = rows.Scan(
+			&user.ID,
+			&user.Nome,
+			&user.Nick,
+			&user.Email,
+			&user.CriadoEm,
+		); erro != nil {
+			return models.Usuario{}, erro
+		}
+
+	}
+	return user, nil
+}
